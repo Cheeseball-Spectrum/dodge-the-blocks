@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squirrel Platformer</title>
+    <title>Platformer Game</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { background: #f0f0f0; display: block; margin: auto; }
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background: lightblue;
+            display: block;
+            margin: auto;
+        }
     </style>
 </head>
 <body>
@@ -15,34 +22,69 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = 800;
-        canvas.height = 600;
+        canvas.height = 400;
 
-        let squirrel = { x: 50, y: 50, width: 50, height: 50, shield: true };
-        let coins = []; // Array to hold coins' positions
-        let enemies = []; // Array to hold enemies' positions
-        let spikes = []; // Array to hold spike positions
-        let goal = { x: 750, y: 500, width: 50, height: 50 };
+        // Game variables
+        let score = 0;
+        const gravity = 0.5;
 
-        function init() {
-            // Initialize game elements, positions, and mechanics
-            // Add proper game logic for mechanics...
+        // Character setup
+        let squirrel = {
+            x: 50,
+            y: canvas.height - 70,
+            width: 50,
+            height: 50,
+            dy: 0,
+            jumping: false,
+            doubleJump: false,
+        };
+
+        // Platform setup
+        let platforms = [];
+        platforms.push({ x: 0, y: canvas.height - 10, width: canvas.width, height: 10 }); // ground platform
+        
+        // Game mechanics
+        function jump() {
+            if (!squirrel.jumping) {
+                squirrel.dy = -10;
+                squirrel.jumping = true;
+            } else if (!squirrel.doubleJump) {
+                squirrel.dy = -10;
+                squirrel.doubleJump = true;
+            }
         }
 
         function update() {
-            // Update game state, check for collisions, control characters...
+            squirrel.dy += gravity;
+            squirrel.y += squirrel.dy;
+
+            // Collision with the ground
+            if (squirrel.y + squirrel.height >= canvas.height) {
+                squirrel.y = canvas.height - squirrel.height;
+                squirrel.jumping = false;
+                squirrel.doubleJump = false;
+                squirrel.dy = 0;
+            }
+
+            // Draw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'green';
+            ctx.fillRect(squirrel.x, squirrel.y, squirrel.width, squirrel.height);
+            platforms.forEach(p => {
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+            });
+
             requestAnimationFrame(update);
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Draw squirrel, coins, enemies, spikes, and goal
-            
-            // If squirrel collides with goal, handle the win condition
-        }
+        // Key event listeners
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowUp') {
+                jump();
+            }
+        });
 
-        init();
         update();
-        draw();
     </script>
 </body>
 </html>
